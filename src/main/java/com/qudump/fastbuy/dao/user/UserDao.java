@@ -1,23 +1,21 @@
 package com.qudump.fastbuy.dao.user;
 
 import com.qudump.fastbuy.model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
-import java.util.Map;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 /**
  * Created by daniel on 2017/3/13.
  */
-public interface UserDao extends JpaRepository<User,Long> {
+public interface UserDao extends PagingAndSortingRepository<User,Long> {
 
-    List<User> query(Map<String,Object> param);
+//    @Query(value = "SELECT * FROM User LIMIT :start, :max",nativeQuery = true)
+//    Page<User> findUsersByPage(Pageable pageable);
+//
+//    User findUserById(Long id);
+//
+//    User save(User user);
+//
+//    void delete(Long id);
 
-    User findUserById(Long id);
-
-    User saveUser(User user);
-
-    void deleteUser(long id);
-
-    User updateUser(User user);
+//    User update(User user);
 }

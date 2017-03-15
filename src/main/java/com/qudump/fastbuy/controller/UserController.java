@@ -1,9 +1,11 @@
 package com.qudump.fastbuy.controller;
 
 import com.qudump.fastbuy.common.BaseController;
+import com.qudump.fastbuy.model.ListResponse;
 import com.qudump.fastbuy.model.User;
 import com.qudump.fastbuy.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by daniel on 2017/3/13.
@@ -24,19 +24,19 @@ public class UserController extends BaseController {
     private UserService userService;
 
     @RequestMapping(value = "/users", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-    public ResponseEntity<List<User>> getUserList(@RequestParam(value = "offset",defaultValue = "0") long offset,
-                                                  @RequestParam(value = "limit",defaultValue = MAX_LONG_AS_STRING) long limit) {
-        List<User> userList;
-        HashMap<String,Object> params = new HashMap<>();
-        params.put("offset",offset);
-        params.put("limit",limit);
+    public ResponseEntity<ListResponse<User>> getUserList(@RequestParam(value = "page",defaultValue = "0") int page) {
 
-        userList = userService.query(params);
+        Page<User> users = userService.findUserByPageNum(page);
 
-        if(null == userList) {
+        if(null == users) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<>(userList, HttpStatus.OK);
+        ListResponse<User> response = new ListResponse<>();
+        response.setData(users.getContent());
+        response.setPage(users.getNumber());
+        response.setTotalPage(users.getTotalPages());
+        response.setMsg("success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

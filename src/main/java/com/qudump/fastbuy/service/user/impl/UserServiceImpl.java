@@ -4,11 +4,12 @@ import com.qudump.fastbuy.dao.user.UserDao;
 import com.qudump.fastbuy.model.User;
 import com.qudump.fastbuy.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by daniel on 2017/3/13.
@@ -16,40 +17,45 @@ import java.util.Map;
 @Service("userService")
 public class UserServiceImpl implements UserService {
 
+    private static final int PAGE_SIZE = 20;
+    private static final String SORT_BY_ID = "id";
+
     @Autowired
     private UserDao userDao;
 
     @Override
-    public List<User> query(Map<String, Object> param) {
-        return null;
+    public Page<User> findUserByPageNum(int pageNum) {
+        Sort sort = new Sort(Sort.Direction.ASC,SORT_BY_ID);
+        Pageable pageable = new PageRequest(pageNum, PAGE_SIZE, sort);
+
+        return userDao.findAll(pageable);
     }
 
     @Transactional
     @Override
     public User findUserById(Long id) {
-        User user = new User();
-        user.setId(id);
-        user.setName("test");
-        user.setMobilePhone("13888888888");
-        user.setAddress("北京中南海");
+
+        User user = userDao.findOne(id);
         return user;
     }
 
     @Transactional
     @Override
     public User saveUser(User user) {
-        return null;
+        User savedUser = userDao.save(user);
+        return savedUser;
     }
 
     @Transactional
     @Override
     public void deleteUser(long id) {
-
+        userDao.delete(id);
     }
 
     @Transactional
     @Override
     public User updateUser(User user) {
-        return null;
+        User updatedUser = userDao.save(user);
+        return updatedUser;
     }
 }

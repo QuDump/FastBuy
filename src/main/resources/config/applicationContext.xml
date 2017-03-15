@@ -15,7 +15,7 @@
             <list>
                 <value>classpath:config/properties/jdbc.properties</value>
                 <!--<value>classpath:config/properties/common.properties</value>-->
-                <!--<value>classpath:config/properties/log4j.properties</value>-->
+                <value>classpath:config/properties/log4j.properties</value>
                 <!--<value>classpath:config/properties/redis.properties</value>-->
             </list>
         </property>
