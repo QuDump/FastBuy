@@ -2,6 +2,7 @@ package com.qudump.fastbuy.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Created by daniel on 2017/3/13.
@@ -18,9 +19,10 @@ public class User implements Serializable {
     @Column(name = "name", length = 30, nullable = false)
     private String name;
     @Column(name = "mobile", length = 11, nullable = false, unique = true)
-    private String mobilePhone;
-    @Column(name = "address", length = 50)
-    private String address;
+    private String mobile;
+
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<Address> addresses;
 
     public Long getId() {
         return id;
@@ -38,19 +40,19 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public String getMobilePhone() {
-        return mobilePhone;
+    public String getMobile() {
+        return mobile;
     }
 
-    public void setMobilePhone(String mobilePhone) {
-        this.mobilePhone = mobilePhone;
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
-    public String getAddress() {
-        return address;
+    public Set<Address> getAddresses() {
+        return addresses;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setAddresses(Set<Address> addresses) {
+        this.addresses = addresses;
     }
 }

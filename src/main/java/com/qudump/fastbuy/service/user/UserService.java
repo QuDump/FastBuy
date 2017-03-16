@@ -1,5 +1,7 @@
 package com.qudump.fastbuy.service.user;
 
+import com.qudump.fastbuy.exception.MobilePhoneDuplicatedException;
+import com.qudump.fastbuy.exception.UserNotFoundException;
 import com.qudump.fastbuy.model.User;
 import org.springframework.data.domain.Page;
 
@@ -10,11 +12,11 @@ public interface UserService {
 
     Page<User> findUserByPageNum(int pageNum);
 
-    User findUserById(Long id);
+    User findUserById(Long id) throws UserNotFoundException;
 
-    User saveUser(User user);
+    User saveUser(User user) throws MobilePhoneDuplicatedException;
 
-    void deleteUser(long id);
+    void deleteUser(long id) throws UserNotFoundException;
 
-    User updateUser(User user);
+    User updateUser(User user) throws UserNotFoundException,MobilePhoneDuplicatedException;
 }

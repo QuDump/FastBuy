@@ -1,6 +1,10 @@
 package com.qudump.fastbuy.controller;
 
 import com.qudump.fastbuy.common.BaseController;
+import com.qudump.fastbuy.exception.ApiMobielDuplicatedException;
+import com.qudump.fastbuy.exception.ApiUserNotFoundExcption;
+import com.qudump.fastbuy.exception.MobilePhoneDuplicatedException;
+import com.qudump.fastbuy.exception.UserNotFoundException;
 import com.qudump.fastbuy.model.ListResponse;
 import com.qudump.fastbuy.model.User;
 import com.qudump.fastbuy.service.user.UserService;
@@ -43,11 +47,10 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/user/{id}", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         User user;
-
-        user = userService.findUserById(id);
-
-        if(null == user) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            user = userService.findUserById(id);
+        } catch (UserNotFoundException e) {
+            throw new ApiUserNotFoundExcption();
         }
 
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -55,19 +58,24 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE, produces = "application/json;charset=utf-8")
     public ResponseEntity<User> deleteUserById(@PathVariable Long id) {
-        User user = userService.findUserById(id);
-        if(null == user) {
-            return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+        try {
+            userService.deleteUser(id);
+        } catch (UserNotFoundException e) {
+            throw new ApiUserNotFoundExcption();
         }
-        userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
-    @RequestMapping(value = "/user/{id}", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    @RequestMapping(value = "/user", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public ResponseEntity<User> saveUser(@RequestBody User user, UriComponentsBuilder ucb) {
+        User savedUser;
+        try {
 
-        User savedUser =  userService.saveUser(user);
+            savedUser =  userService.saveUser(user);
+        } catch (MobilePhoneDuplicatedException e) {
+            throw new ApiMobielDuplicatedException();
+        }
 
         HttpHeaders headers = new HttpHeaders();
         URI locationUri = ucb.path("/user/").path(String.valueOf(savedUser.getId())).build().toUri();
@@ -78,18 +86,16 @@ public class UserController extends BaseController {
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT, produces = "application/json;charset=utf-8")
     public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User user) {
-        User currentUser = userService.findUserById(id);
 
-        if(null == currentUser) {
-            return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+        user.setId(id);
+        try {
+            userService.updateUser(user);
+        } catch (UserNotFoundException e) {
+            throw new ApiUserNotFoundExcption();
+        } catch (MobilePhoneDuplicatedException e) {
+            throw new ApiMobielDuplicatedException();
         }
-
-        currentUser.setId(id);
-        currentUser.setName(user.getName());
-        currentUser.setMobilePhone(user.getMobilePhone());
-        currentUser.setAddress(user.getAddress());
-        userService.updateUser(currentUser);
-        return new ResponseEntity<User>(currentUser, HttpStatus.OK);
+        return new ResponseEntity<User>(user, HttpStatus.OK);
     }
 
 }

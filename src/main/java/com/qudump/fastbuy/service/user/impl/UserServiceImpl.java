@@ -1,6 +1,8 @@
 package com.qudump.fastbuy.service.user.impl;
 
 import com.qudump.fastbuy.dao.user.UserDao;
+import com.qudump.fastbuy.exception.MobilePhoneDuplicatedException;
+import com.qudump.fastbuy.exception.UserNotFoundException;
 import com.qudump.fastbuy.model.User;
 import com.qudump.fastbuy.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,26 +38,43 @@ public class UserServiceImpl implements UserService {
     public User findUserById(Long id) {
 
         User user = userDao.findOne(id);
+        if(null == user) {
+            throw new UserNotFoundException();
+        }
         return user;
     }
 
     @Transactional
     @Override
     public User saveUser(User user) {
-        User savedUser = userDao.save(user);
-        return savedUser;
+        User existedUser = userDao.findUserByMobile(user.getMobile());
+        if(null != existedUser) {
+            throw new MobilePhoneDuplicatedException();
+        }
+        return userDao.save(user);
     }
 
     @Transactional
     @Override
     public void deleteUser(long id) {
+        User user = userDao.findOne(id);
+        if(null == user) {
+            throw new UserNotFoundException();
+        }
         userDao.delete(id);
     }
 
     @Transactional
     @Override
     public User updateUser(User user) {
-        User updatedUser = userDao.save(user);
-        return updatedUser;
+        User foundUser = userDao.findOne(user.getId());
+        if(null == foundUser) {
+            throw new UserNotFoundException();
+        }
+        foundUser = userDao.findUserByMobile(user.getMobile());
+        if(null != foundUser) {
+            throw new MobilePhoneDuplicatedException();
+        }
+        return userDao.save(user);
     }
 }
